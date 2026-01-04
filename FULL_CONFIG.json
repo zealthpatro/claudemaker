@@ -107,5 +107,38 @@
     "launcher_bot2": "/home/trader/start_bot2.sh",
     "launcher_both": "/home/trader/LAUNCH_BOTS.sh",
     "monitor": "/home/trader/monitor.sh"
+  },
+
+  "automation": {
+    "supervisor": {
+      "script": "/home/trader/bot_supervisor.py",
+      "service": "trading-supervisor.service",
+      "health_check_interval": 60,
+      "max_restart_attempts": 5,
+      "restart_cooldown": 300
+    },
+    "telegram_commander": {
+      "script": "/home/trader/telegram_commander.py",
+      "service": "telegram-commander.service",
+      "commands": ["/status", "/balance", "/positions", "/pause", "/resume", "/restart", "/stop", "/report", "/drawdown", "/config", "/logs", "/health", "/disk"]
+    },
+    "reports": {
+      "script": "/home/trader/report_generator.py",
+      "service": "report-generator.service",
+      "daily_time": "20:00",
+      "weekly_day": "sunday",
+      "weekly_time": "21:00"
+    },
+    "maintenance": {
+      "script": "/home/trader/maintenance.py",
+      "service": "trading-maintenance.service",
+      "timer": "trading-maintenance.timer",
+      "schedule": "04:00 daily",
+      "log_retention_days": 7,
+      "backup_retention_days": 30
+    },
+    "log_analyzer": {
+      "script": "/home/trader/log_analyzer.py"
+    }
   }
 }

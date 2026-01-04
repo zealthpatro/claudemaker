@@ -292,4 +292,73 @@ You will receive:
 
 ---
 
-*Last Updated: January 3, 2026 20:22 UTC+4*
+## AUTOMATION SYSTEM
+
+### Bot Supervisor (bot_supervisor.py)
+- Auto-restarts bots if they crash (max 5 attempts with cooldown)
+- Health monitoring every 60 seconds
+- Drawdown protection with auto-pause at limits
+- Telegram notifications on restart/issues
+
+### Telegram Commander (telegram_commander.py)
+Remote control via Telegram commands:
+```
+/status    - Bot status overview
+/balance   - Account balances
+/positions - Open positions
+/pause     - Pause all trading
+/resume    - Resume trading
+/restart   - Restart bots
+/stop      - Stop bots
+/report    - Performance report
+/drawdown  - Drawdown levels
+/config    - View/update config
+/logs      - Recent log entries
+/health    - System health
+/disk      - Disk usage
+```
+
+### Report Generator (report_generator.py)
+- Daily reports at 8:00 PM
+- Weekly reports on Sunday at 9:00 PM
+- Includes P/L, win rate, progress vs target
+
+### Log Analyzer (log_analyzer.py)
+- Analyzes trade patterns
+- Performance by setup, day, hour
+- Streak analysis
+- Automated insights
+
+### Maintenance (maintenance.py)
+- Log rotation (>10MB files)
+- Disk cleanup
+- Config backups
+- Health checks
+
+### Systemd Services
+```bash
+# Supervisor (auto-restart bots)
+sudo systemctl status trading-supervisor
+
+# Telegram Commander
+sudo systemctl status telegram-commander
+
+# Report Generator
+sudo systemctl status report-generator
+
+# Maintenance Timer (runs daily at 4 AM)
+sudo systemctl status trading-maintenance.timer
+```
+
+### Deployment
+```bash
+# Deploy to VPS
+./deploy.sh
+
+# Or run locally
+./deploy.sh --local
+```
+
+---
+
+*Last Updated: January 4, 2026*

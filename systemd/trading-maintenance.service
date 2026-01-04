@@ -1,0 +1,15 @@
+[Unit]
+Description=Trading Bot Maintenance Tasks
+After=network.target
+
+[Service]
+Type=oneshot
+User=trader
+Group=trader
+WorkingDirectory=/home/trader
+ExecStart=/usr/bin/python3 /home/trader/maintenance.py full
+StandardOutput=append:/home/trader/maintenance.log
+StandardError=append:/home/trader/maintenance.log
+
+# Environment
+Environment=PYTHONUNBUFFERED=1

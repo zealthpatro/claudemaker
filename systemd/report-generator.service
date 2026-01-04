@@ -1,0 +1,24 @@
+[Unit]
+Description=Trading Bot Report Generator
+After=network.target
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader
+ExecStart=/usr/bin/python3 /home/trader/report_generator.py
+Restart=always
+RestartSec=30
+StandardOutput=append:/home/trader/report_generator.log
+StandardError=append:/home/trader/report_generator.log
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+
+# Resource limits
+MemoryLimit=256M
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

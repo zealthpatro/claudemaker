@@ -1,0 +1,24 @@
+[Unit]
+Description=Trading Bot Telegram Commander
+After=network.target trading-supervisor.service
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader
+ExecStart=/usr/bin/python3 /home/trader/telegram_commander.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/trader/telegram_commander.log
+StandardError=append:/home/trader/telegram_commander.log
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+
+# Resource limits
+MemoryLimit=256M
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

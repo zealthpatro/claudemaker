@@ -1,0 +1,24 @@
+[Unit]
+Description=Gold Trading Bot Supervisor
+After=network.target
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader
+ExecStart=/usr/bin/python3 /home/trader/bot_supervisor.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/trader/supervisor.log
+StandardError=append:/home/trader/supervisor.log
+
+# Environment
+Environment=PYTHONUNBUFFERED=1
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target
