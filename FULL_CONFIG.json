@@ -1,0 +1,111 @@
+{
+  "project": "Gold Trading Bot System",
+  "created": "2026-01-03",
+  "status": "LIVE",
+
+  "capital_com": {
+    "api_key": "3F3RHbKsBbivSLYe",
+    "identifier": "saurav.patr@gmail.com",
+    "password": "Cl@ud#123",
+    "base_url": "https://demo-api-capital.backend-capital.com",
+    "expiry": "2027-01-03"
+  },
+
+  "accounts": {
+    "fixed_rr": {
+      "name": "test patro",
+      "id": "303527589371466014",
+      "balance_aed": 50838,
+      "strategy": "Fixed 1:5 R:R"
+    },
+    "adaptive": {
+      "name": "adaptive claude",
+      "id": "303621563255902494",
+      "balance_aed": 54000,
+      "strategy": "Adaptive R:R by Tier"
+    }
+  },
+
+  "telegram": {
+    "bot_name": "Capital_demo_bot",
+    "username": "@XaUdemo_bot",
+    "token": "8376345331:AAHWoZzkqT26cyeRPGa8MfcaVZWvTcan9lU",
+    "chat_id": "7831118282"
+  },
+
+  "database": {
+    "host": "165.227.191.236",
+    "dbname": "trading_bot",
+    "user": "trader",
+    "password": "TradingBot2026Secure!"
+  },
+
+  "setups": {
+    "tier_a": [
+      {"name": "5min: bear_fvg + mon", "tf": "MINUTE_5", "dir": "SELL", "conds": ["bear_fvg", "mon"], "wr": 0.56, "mfe": 20.9},
+      {"name": "1H: mon + rsi<40", "tf": "HOUR", "dir": "BUY", "conds": ["mon", "rsi<40"], "wr": 0.50, "mfe": 2.3},
+      {"name": "1H: mon + rsi<30", "tf": "HOUR", "dir": "BUY", "conds": ["mon", "rsi<30"], "wr": 0.56, "mfe": 2.2}
+    ],
+    "tier_b": [
+      {"name": "15min: bull_bos + rsi<20", "tf": "MINUTE_15", "dir": "BUY", "conds": ["bull_bos", "rsi<20"], "wr": 0.35, "mfe": 8.7},
+      {"name": "15min: green + rsi<20", "tf": "MINUTE_15", "dir": "BUY", "conds": ["green", "rsi<20"], "wr": 0.36, "mfe": 7.4},
+      {"name": "5min: bear_fvg + wed", "tf": "MINUTE_5", "dir": "SELL", "conds": ["bear_fvg", "wed"], "wr": 0.35, "mfe": 1.9},
+      {"name": "4H: bull_eng + rsi<30", "tf": "HOUR_4", "dir": "BUY", "conds": ["bull_eng", "rsi<30"], "wr": 0.37, "mfe": 8.2},
+      {"name": "1D: bull_pin + stoch<30", "tf": "DAY", "dir": "BUY", "conds": ["bull_pin", "stoch<30"], "wr": 0.45, "mfe": 9.9}
+    ],
+    "tier_c": [
+      {"name": "1H: stoch>80 + sun", "tf": "HOUR", "dir": "SELL", "conds": ["stoch>80", "sun"], "wr": 0.35, "mfe": 17.5}
+    ]
+  },
+
+  "risk_management": {
+    "max_daily_drawdown": 0.15,
+    "max_weekly_drawdown": 0.25,
+    "max_single_trade_risk": 0.05,
+    "max_open_trades": 4,
+    "default_risk_pct": 0.03
+  },
+
+  "strategy_params": {
+    "fixed_rr": {
+      "target_rr": 5.0,
+      "risk_pct": 0.03,
+      "stop_atr": 1.0
+    },
+    "adaptive": {
+      "tier_a": {"target_rr": 2.5, "risk_pct": 0.04, "stop_atr": 1.0},
+      "tier_b": {"target_rr": 5.0, "risk_pct": 0.03, "stop_atr": 1.0},
+      "tier_c": {"target_rr": 10.0, "risk_pct": 0.01, "stop_atr": 2.0}
+    }
+  },
+
+  "backtest_results": {
+    "period": "30 days",
+    "signals": 64,
+    "best_strategy": "1:5 Fixed R:R",
+    "win_rate": 0.39,
+    "starting_capital": 3000,
+    "ending_capital": 10740,
+    "return_pct": 2.58
+  },
+
+  "key_discoveries": [
+    "1:5 R:R beats Runner strategy ($10,740 vs -$1,950 in 30 days)",
+    "Monday is best day for gold trading",
+    "RSI < 20 significantly increases win rate",
+    "FVG is most reliable pattern (especially Mon/Wed)",
+    "Most winners hit target in hours not days",
+    "5min setups: 10-30 min median to target",
+    "15min setups: 45-60 min median to target"
+  ],
+
+  "files": {
+    "main_bot": "/home/trader/ultimate_trading_system.py",
+    "capital_config": "/home/trader/capital_both_accounts.json",
+    "telegram_config": "/home/trader/telegram_config.json",
+    "launcher_bot1": "/home/trader/start_bot1.sh",
+    "launcher_bot2": "/home/trader/start_bot2.sh",
+    "launcher_both": "/home/trader/LAUNCH_BOTS.sh",
+    "monitor": "/home/trader/monitor.sh"
+  }
+}
