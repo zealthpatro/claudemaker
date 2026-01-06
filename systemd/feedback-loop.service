@@ -1,0 +1,21 @@
+[Unit]
+Description=Feedback Loop Controller Service
+After=network.target trade-analyzer.service
+Wants=trade-analyzer.service
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader/algo_trading
+Environment=PYTHONPATH=/home/trader/algo_trading
+ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/learning/feedback_loop.py
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+MemoryMax=256M
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

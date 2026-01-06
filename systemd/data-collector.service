@@ -1,0 +1,23 @@
+[Unit]
+Description=Precious Metals Data Collector Service
+After=network.target postgresql.service redis.service
+Wants=redis.service
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader/algo_trading
+Environment=PYTHONPATH=/home/trader/algo_trading
+ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/data/data_collector.py
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

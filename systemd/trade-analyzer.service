@@ -1,0 +1,20 @@
+[Unit]
+Description=Trade Analyzer Service
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader/algo_trading
+Environment=PYTHONPATH=/home/trader/algo_trading
+ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/learning/trade_analyzer.py
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+MemoryMax=256M
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

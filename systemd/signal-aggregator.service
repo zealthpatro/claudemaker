@@ -1,0 +1,21 @@
+[Unit]
+Description=Signal Aggregator Service
+After=network.target gold-signal-generator.service silver-signal-generator.service
+Wants=gold-signal-generator.service silver-signal-generator.service
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/home/trader/algo_trading
+Environment=PYTHONPATH=/home/trader/algo_trading
+ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/signals/signal_aggregator.py
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+MemoryMax=256M
+CPUQuota=25%
+
+[Install]
+WantedBy=multi-user.target

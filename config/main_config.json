@@ -1,0 +1,256 @@
+{
+  "project": "Precious Metals Algo Trading System",
+  "version": "2.0.0",
+  "created": "2026-01-06",
+  "status": "DEVELOPMENT",
+
+  "capital_com": {
+    "api_key": "3F3RHbKsBbivSLYe",
+    "identifier": "saurav.patr@gmail.com",
+    "password": "Cl@ud#123",
+    "base_url": "https://demo-api-capital.backend-capital.com",
+    "expiry": "2027-01-03"
+  },
+
+  "accounts": {
+    "scalper": {
+      "name": "test patro",
+      "id": "303527589371466014",
+      "bot_types": ["scalper", "sniper"],
+      "strategy": "High frequency, low risk"
+    },
+    "swing": {
+      "name": "adaptive claude",
+      "id": "303621563255902494",
+      "bot_types": ["day_trader", "swing", "position"],
+      "strategy": "Adaptive R:R by timeframe"
+    }
+  },
+
+  "telegram": {
+    "bot_name": "Capital_demo_bot",
+    "username": "@XaUdemo_bot",
+    "token": "8376345331:AAHWoZzkqT26cyeRPGa8MfcaVZWvTcan9lU",
+    "chat_id": "7831118282"
+  },
+
+  "database": {
+    "host": "165.227.191.236",
+    "port": 5432,
+    "dbname": "trading_bot",
+    "user": "trader",
+    "password": "TradingBot2026Secure!"
+  },
+
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0
+  },
+
+  "symbols": {
+    "XAUUSD": {
+      "name": "Gold",
+      "capital_epic": "GOLD",
+      "pip_value": 0.01,
+      "min_lot": 0.01,
+      "typical_spread": 0.30,
+      "margin_factor": 0.05,
+      "trading_hours": "24/5",
+      "enabled": true
+    },
+    "XAGUSD": {
+      "name": "Silver",
+      "capital_epic": "SILVER",
+      "pip_value": 0.001,
+      "min_lot": 0.1,
+      "typical_spread": 0.02,
+      "margin_factor": 0.10,
+      "trading_hours": "24/5",
+      "enabled": true
+    }
+  },
+
+  "timeframes": {
+    "MINUTE": {
+      "seconds": 60,
+      "retention_days": 7,
+      "fetch_history_days": 2
+    },
+    "MINUTE_5": {
+      "seconds": 300,
+      "retention_days": 30,
+      "fetch_history_days": 7
+    },
+    "MINUTE_15": {
+      "seconds": 900,
+      "retention_days": 60,
+      "fetch_history_days": 14
+    },
+    "HOUR": {
+      "seconds": 3600,
+      "retention_days": 180,
+      "fetch_history_days": 30
+    },
+    "HOUR_4": {
+      "seconds": 14400,
+      "retention_days": 365,
+      "fetch_history_days": 90
+    },
+    "DAY": {
+      "seconds": 86400,
+      "retention_days": 1095,
+      "fetch_history_days": 365
+    }
+  },
+
+  "bots": {
+    "scalper": {
+      "enabled": true,
+      "account": "scalper",
+      "timeframes": ["MINUTE", "MINUTE_5"],
+      "symbols": ["XAUUSD", "XAGUSD"],
+      "min_confidence": 0.60,
+      "risk_pct": 0.01,
+      "max_concurrent": 3,
+      "target_rr": 5.0,
+      "stop_atr_multiplier": 0.5,
+      "max_hold_minutes": 60,
+      "sessions": ["london_open", "ny_open"],
+      "cooldown_minutes": 15
+    },
+    "day_trader": {
+      "enabled": true,
+      "account": "swing",
+      "timeframes": ["MINUTE_5", "MINUTE_15", "HOUR"],
+      "symbols": ["XAUUSD", "XAGUSD"],
+      "min_confidence": 0.55,
+      "risk_pct": 0.02,
+      "max_concurrent": 4,
+      "target_rr": 3.0,
+      "stop_atr_multiplier": 1.0,
+      "close_before_day_end": true,
+      "cooldown_minutes": 30
+    },
+    "swing": {
+      "enabled": true,
+      "account": "swing",
+      "timeframes": ["HOUR", "HOUR_4"],
+      "symbols": ["XAUUSD", "XAGUSD"],
+      "min_confidence": 0.50,
+      "risk_pct": 0.03,
+      "max_concurrent": 3,
+      "target_rr": 5.0,
+      "stop_atr_multiplier": 1.5,
+      "trailing_stop": true,
+      "trailing_trigger_r": 2.0,
+      "cooldown_minutes": 120
+    },
+    "position": {
+      "enabled": true,
+      "account": "swing",
+      "timeframes": ["HOUR_4", "DAY"],
+      "symbols": ["XAUUSD", "XAGUSD"],
+      "min_confidence": 0.55,
+      "risk_pct": 0.02,
+      "max_concurrent": 2,
+      "target_rr": 10.0,
+      "stop_atr_multiplier": 2.0,
+      "scale_in": true,
+      "scale_in_levels": [0.5, 0.3, 0.2],
+      "cooldown_minutes": 480
+    },
+    "sniper": {
+      "enabled": true,
+      "account": "scalper",
+      "timeframes": ["ALL"],
+      "symbols": ["XAUUSD", "XAGUSD"],
+      "min_confidence": 0.85,
+      "risk_pct": 0.05,
+      "max_concurrent": 1,
+      "target_rr": 20.0,
+      "stop_atr_multiplier": 1.0,
+      "limit_orders_only": true,
+      "cooldown_minutes": 60
+    }
+  },
+
+  "risk_management": {
+    "max_daily_drawdown": 0.15,
+    "max_weekly_drawdown": 0.25,
+    "max_single_trade_risk": 0.05,
+    "max_total_exposure": 0.20,
+    "max_open_trades": 8,
+    "max_correlation": 0.70,
+    "pause_on_consecutive_losses": 5,
+    "kelly_fraction": 0.5,
+    "volatility_scaling": true
+  },
+
+  "signal_tiers": {
+    "A": {
+      "min_win_rate": 0.50,
+      "min_mfe": 2.0,
+      "weight": 1.5
+    },
+    "B": {
+      "min_win_rate": 0.35,
+      "min_mfe": 5.0,
+      "weight": 1.0
+    },
+    "C": {
+      "min_win_rate": 0.30,
+      "min_mfe": 10.0,
+      "weight": 0.7
+    }
+  },
+
+  "setups": {
+    "tier_a": [
+      {"name": "5min_bear_fvg_mon", "tf": "MINUTE_5", "dir": "SELL", "conds": ["bear_fvg", "monday"], "wr": 0.56, "mfe": 20.9},
+      {"name": "1h_mon_rsi_oversold", "tf": "HOUR", "dir": "BUY", "conds": ["monday", "rsi<40"], "wr": 0.50, "mfe": 2.3},
+      {"name": "1h_mon_rsi_deep_oversold", "tf": "HOUR", "dir": "BUY", "conds": ["monday", "rsi<30"], "wr": 0.56, "mfe": 2.2}
+    ],
+    "tier_b": [
+      {"name": "15min_bull_bos_rsi", "tf": "MINUTE_15", "dir": "BUY", "conds": ["bull_bos", "rsi<20"], "wr": 0.35, "mfe": 8.7},
+      {"name": "15min_green_rsi", "tf": "MINUTE_15", "dir": "BUY", "conds": ["green_candle", "rsi<20"], "wr": 0.36, "mfe": 7.4},
+      {"name": "5min_bear_fvg_wed", "tf": "MINUTE_5", "dir": "SELL", "conds": ["bear_fvg", "wednesday"], "wr": 0.35, "mfe": 1.9},
+      {"name": "4h_bull_eng_rsi", "tf": "HOUR_4", "dir": "BUY", "conds": ["bull_engulfing", "rsi<30"], "wr": 0.37, "mfe": 8.2},
+      {"name": "1d_bull_pin_stoch", "tf": "DAY", "dir": "BUY", "conds": ["bull_pin", "stoch<30"], "wr": 0.45, "mfe": 9.9}
+    ],
+    "tier_c": [
+      {"name": "1h_stoch_overbought_sun", "tf": "HOUR", "dir": "SELL", "conds": ["stoch>80", "sunday"], "wr": 0.35, "mfe": 17.5},
+      {"name": "1h_rsi_deep_oversold_sun", "tf": "HOUR", "dir": "BUY", "conds": ["rsi<20", "sunday"], "wr": 0.35, "mfe": 15.0}
+    ]
+  },
+
+  "ml": {
+    "enabled": true,
+    "retrain_frequency": "weekly",
+    "retrain_day": "sunday",
+    "retrain_time": "02:00",
+    "min_trades_for_update": 50,
+    "ab_test_duration_days": 14,
+    "ab_test_traffic_split": 0.30,
+    "promotion_threshold": 0.20,
+    "demotion_threshold": -0.20,
+    "model_path": "/home/trader/algo_trading/models"
+  },
+
+  "sessions": {
+    "asia": {"start": "00:00", "end": "08:00", "timezone": "UTC"},
+    "london_open": {"start": "07:00", "end": "10:00", "timezone": "UTC"},
+    "london": {"start": "08:00", "end": "16:00", "timezone": "UTC"},
+    "ny_open": {"start": "13:00", "end": "16:00", "timezone": "UTC"},
+    "ny": {"start": "13:00", "end": "21:00", "timezone": "UTC"},
+    "overlap": {"start": "13:00", "end": "16:00", "timezone": "UTC"}
+  },
+
+  "monitoring": {
+    "health_check_interval": 60,
+    "telegram_alerts": true,
+    "log_level": "INFO",
+    "log_rotation_mb": 10,
+    "log_retention_days": 30
+  }
+}
