@@ -1,0 +1,15 @@
+[Unit]
+Description=Trading System - Risk Manager
+After=network.target redis-server.service postgresql.service
+Before=bot-scalper.service bot-day-trader.service bot-swing.service bot-position.service bot-sniper.service
+
+[Service]
+Type=simple
+User=trader
+WorkingDirectory=/home/trader/algo_trading
+ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/risk/risk_manager.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

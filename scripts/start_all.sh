@@ -24,6 +24,11 @@ sudo systemctl start silver-signal-generator
 sleep 2
 sudo systemctl start signal-aggregator
 
+# Risk Manager (MUST start before bots)
+echo "Starting risk manager..."
+sleep 2
+sudo systemctl start risk-manager
+
 # Bot Layer
 echo "Starting trading bots..."
 sleep 2

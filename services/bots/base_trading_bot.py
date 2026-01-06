@@ -224,6 +224,14 @@ class BaseTradingBot(abc.ABC):
         if self.paused:
             return False, "Bot is paused"
 
+        # CHECK RISK MANAGER FIRST - Global halt check
+        try:
+            halt_status = mq.get('trading_halted')
+            if halt_status and halt_status.get('halted', False):
+                return False, f"Trading halted: {halt_status.get('reason', 'Risk limit')}"
+        except:
+            pass
+
         # Check max concurrent positions
         max_concurrent = self.bot_config.get('max_concurrent', 4)
         if len(self.positions) >= max_concurrent:
@@ -259,11 +267,32 @@ class BaseTradingBot(abc.ABC):
 
     def calculate_position_size(self, symbol: str, entry: float,
                                 stop_loss: float, risk_override: float = None) -> float:
-        """Calculate position size based on risk"""
-        account_balance = self._get_account_balance()
-        risk_pct = risk_override or self.bot_config.get('risk_pct', 0.02)
+        """Calculate position size based on risk - USES COMPOUNDING via High Water Mark"""
+        # Get risk status from risk manager for compounding
+        try:
+            risk_status = mq.get('risk_status')
+            if risk_status:
+                high_water_mark = risk_status.get('high_water_mark', 0)
+                current_balance = risk_status.get('current_balance', 0)
+                drawdown_from_hwm = risk_status.get('drawdown_from_hwm', 0)
 
-        risk_amount = account_balance * risk_pct
+                # Use HIGH WATER MARK for compounding (only compound profits)
+                # But cap at current balance for safety
+                effective_balance = min(high_water_mark, current_balance) if high_water_mark > 0 else current_balance
+
+                # Reduce risk if in drawdown > 2%
+                risk_pct = risk_override or self.bot_config.get('risk_pct', 0.02)
+                if drawdown_from_hwm > 2:
+                    risk_pct *= 0.5  # Cut risk in half when in drawdown
+                    logger.info(f"Reduced risk to {risk_pct:.1%} due to {drawdown_from_hwm:.1f}% drawdown")
+            else:
+                effective_balance = self._get_account_balance()
+                risk_pct = risk_override or self.bot_config.get('risk_pct', 0.02)
+        except:
+            effective_balance = self._get_account_balance()
+            risk_pct = risk_override or self.bot_config.get('risk_pct', 0.02)
+
+        risk_amount = effective_balance * risk_pct
         stop_distance = abs(entry - stop_loss)
 
         if stop_distance == 0:

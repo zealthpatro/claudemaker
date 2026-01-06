@@ -14,6 +14,7 @@ SERVICES=(
     "gold-signal-generator"
     "silver-signal-generator"
     "signal-aggregator"
+    "risk-manager"
     "bot-scalper"
     "bot-day-trader"
     "bot-swing"

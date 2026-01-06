@@ -23,6 +23,9 @@ sudo systemctl stop bot-swing 2>/dev/null || true
 sudo systemctl stop bot-day-trader 2>/dev/null || true
 sudo systemctl stop bot-scalper 2>/dev/null || true
 
+# Risk Manager
+sudo systemctl stop risk-manager 2>/dev/null || true
+
 # Signal Layer
 sudo systemctl stop signal-aggregator 2>/dev/null || true
 sudo systemctl stop silver-signal-generator 2>/dev/null || true
