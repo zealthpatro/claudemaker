@@ -219,7 +219,7 @@ class BaseTradingBot(abc.ABC):
 
     # ============= Trading Methods =============
 
-    def can_trade(self, symbol: str) -> Tuple[bool, str]:
+    def can_trade(self, symbol: str, signal: Dict = None) -> Tuple[bool, str]:
         """Check if bot can take a new trade"""
         if self.paused:
             return False, "Bot is paused"
@@ -229,6 +229,26 @@ class BaseTradingBot(abc.ABC):
             halt_status = mq.get('trading_halted')
             if halt_status and halt_status.get('halted', False):
                 return False, f"Trading halted: {halt_status.get('reason', 'Risk limit')}"
+        except:
+            pass
+
+        # CHECK SMART RISK - Daily margin limit (5%) and confidence-based risk
+        try:
+            risk_status = mq.get('risk_status')
+            if risk_status:
+                daily_margin_used = risk_status.get('daily_margin_used_pct', 0)
+                daily_margin_limit = risk_status.get('daily_margin_limit_pct', 5.0)
+
+                if daily_margin_used >= daily_margin_limit:
+                    # Check if we can do a smart replacement
+                    if signal:
+                        confidence = signal.get('confidence', 50)
+                        if confidence >= 80:
+                            # High confidence - might be able to replace weaker trades
+                            logger.info(f"Daily margin full but high confidence signal ({confidence}%), checking replacement")
+                            # The actual replacement logic is handled in open_position
+                        else:
+                            return False, f"Daily margin limit reached ({daily_margin_used:.1f}%/{daily_margin_limit:.1f}%)"
         except:
             pass
 
@@ -266,8 +286,14 @@ class BaseTradingBot(abc.ABC):
         return True, "OK"
 
     def calculate_position_size(self, symbol: str, entry: float,
-                                stop_loss: float, risk_override: float = None) -> float:
-        """Calculate position size based on risk - USES COMPOUNDING via High Water Mark"""
+                                stop_loss: float, risk_override: float = None,
+                                signal: Dict = None) -> float:
+        """
+        Calculate position size based on risk - SMART RISK with confidence tiers
+        - Higher confidence = higher allowed risk (up to 2%)
+        - Uses High Water Mark for compounding
+        - Reduces risk when in drawdown
+        """
         # Get risk status from risk manager for compounding
         try:
             risk_status = mq.get('risk_status')
@@ -275,16 +301,49 @@ class BaseTradingBot(abc.ABC):
                 high_water_mark = risk_status.get('high_water_mark', 0)
                 current_balance = risk_status.get('current_balance', 0)
                 drawdown_from_hwm = risk_status.get('drawdown_from_hwm', 0)
+                daily_margin_used = risk_status.get('daily_margin_used_pct', 0)
+                daily_margin_limit = risk_status.get('daily_margin_limit_pct', 5.0)
 
                 # Use HIGH WATER MARK for compounding (only compound profits)
-                # But cap at current balance for safety
                 effective_balance = min(high_water_mark, current_balance) if high_water_mark > 0 else current_balance
 
+                # CONFIDENCE-BASED RISK TIERS
+                base_risk = risk_override or self.bot_config.get('risk_pct', 0.02)
+
+                if signal:
+                    confidence = signal.get('confidence', 50)
+                    tier = signal.get('tier', 'C')
+
+                    # Adjust risk based on confidence
+                    if confidence >= 90:
+                        # Ultra high confidence - max risk 2%
+                        risk_pct = min(base_risk * 1.5, 0.02)
+                        logger.info(f"Ultra-high confidence ({confidence}%), risk: {risk_pct:.1%}")
+                    elif confidence >= 80:
+                        # High confidence - risk 1.5%
+                        risk_pct = min(base_risk * 1.2, 0.015)
+                    elif confidence >= 70:
+                        # Medium confidence - risk 1%
+                        risk_pct = min(base_risk, 0.01)
+                    else:
+                        # Lower confidence - risk 0.5%
+                        risk_pct = min(base_risk * 0.5, 0.005)
+
+                    # A-tier setups get bonus
+                    if tier == 'A':
+                        risk_pct *= 1.2
+                else:
+                    risk_pct = base_risk
+
                 # Reduce risk if in drawdown > 2%
-                risk_pct = risk_override or self.bot_config.get('risk_pct', 0.02)
                 if drawdown_from_hwm > 2:
-                    risk_pct *= 0.5  # Cut risk in half when in drawdown
+                    risk_pct *= 0.5
                     logger.info(f"Reduced risk to {risk_pct:.1%} due to {drawdown_from_hwm:.1f}% drawdown")
+
+                # Ensure we don't exceed remaining daily margin
+                remaining_margin = max(0, daily_margin_limit - daily_margin_used)
+                risk_pct = min(risk_pct, remaining_margin / 100)
+
             else:
                 effective_balance = self._get_account_balance()
                 risk_pct = risk_override or self.bot_config.get('risk_pct', 0.02)

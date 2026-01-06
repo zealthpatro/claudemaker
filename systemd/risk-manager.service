@@ -7,7 +7,7 @@ Before=bot-scalper.service bot-day-trader.service bot-swing.service bot-position
 Type=simple
 User=trader
 WorkingDirectory=/home/trader/algo_trading
-ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/risk/risk_manager.py
+ExecStart=/usr/bin/python3 /home/trader/algo_trading/services/risk/smart_risk_manager.py
 Restart=always
 RestartSec=5
 
